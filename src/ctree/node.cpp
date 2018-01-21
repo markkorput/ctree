@@ -79,4 +79,6 @@ Node::iterator Node::erase(Node* node){
   for(auto it = this->begin(); it != this->end(); it++)
     if((*it).get() == node)
       return this->erase(it);
+
+  return this->end();
 }
