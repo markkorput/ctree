@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "ctree/ctree.h"
+#include "ctree/node.h"
 
 using namespace ctree;
 

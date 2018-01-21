@@ -74,3 +74,11 @@ Node::iterator Node::erase(Node::const_iterator first, Node::const_iterator last
 Node::iterator Node::erase(NodeRef nodeRef){
   return this->erase(std::find(this->begin(), this->end(), nodeRef));
 }
+
+Node::iterator Node::erase(Node* node){
+  for(auto it = this->begin(); it != this->end(); it++)
+    if((*it).get() == node)
+      return this->erase(it);
+
+  return this->end();
+}
