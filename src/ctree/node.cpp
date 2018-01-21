@@ -13,49 +13,58 @@ bool Node::push_back(NodeRef nodeRef){
     return false;
 
   Super::push_back(nodeRef);
+  this->newChildSignal.emit(nodeRef);
   return true;
 }
 
 Node::iterator Node::erase(Node::iterator pos){
   bool contained = (pos != this->end());
 
-  Super::erase(pos);
+  auto result = Super::erase(pos);
 
   if(contained){
-    // removedChildEvent.trigger(*it)
+    childRemovedSignal.emit(*pos);
   }
+
+  return result;
 }
 
 Node::iterator Node::erase(Node::const_iterator pos){
   bool contained = (pos != this->end());
 
-  Super::erase(pos);
+  auto result = Super::erase(pos);
 
   if(contained){
-    // removedChildEvent.trigger(*it)
+    childRemovedSignal.emit(*pos);
   }
+
+  return result;
 }
 
 Node::iterator Node::erase(Node::iterator first, Node::iterator last ){
   std::vector<NodeRef> removedNodeRefs(first, last);
 
-  Super::erase(first,last);
+  auto result = Super::erase(first,last);
 
-  for(auto removeNodeRef : removedNodeRefs){
-    // removedChildEvent.trigger(*it)
+  for(auto removedNodeRef : removedNodeRefs){
+    childRemovedSignal.emit(removedNodeRef);
   }
+
+  return result;
 }
 
 Node::iterator Node::erase(Node::const_iterator first, Node::const_iterator last ){
   std::vector<NodeRef> removedNodeRefs(first, last);
 
-  Super::erase(first,last);
+  auto result = Super::erase(first,last);
 
-  for(auto removeNodeRef : removedNodeRefs){
-    // removedChildEvent.trigger(*it)
+  for(auto removedNodeRef : removedNodeRefs){
+    childRemovedSignal.emit(removedNodeRef);
   }
+
+  return result;
 }
 
 Node::iterator Node::erase(NodeRef nodeRef){
-  this->erase(std::find(this->begin(), this->end(), nodeRef));
+  return this->erase(std::find(this->begin(), this->end(), nodeRef));
 }

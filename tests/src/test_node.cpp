@@ -28,4 +28,50 @@ TEST_CASE("ctree::Node", ""){
     REQUIRE(parent.push_back(child2));
     REQUIRE(parent[1].get() == child2);
   }
+
+  SECTION("newChildSignal"){
+    Node parent;
+    auto child = std::make_shared<Node>();
+    NodeRef result=nullptr;
+    // register newChildSignal callback that writes the new child to result
+    parent.newChildSignal.connect([&result](NodeRef newChildRef){ result = newChildRef; });
+    // verify initial state
+    REQUIRE(result == nullptr);
+    // add child
+    parent.push_back(child);
+    // verify signal callback got executed
+    REQUIRE(result == child);
+  }
+
+  SECTION("childRemovedSignal"){
+    SECTION("for_erase_NodeRef"){
+      Node parent;
+      auto child = std::make_shared<Node>();
+      parent.push_back(child);
+      NodeRef result=nullptr;
+      // register newChildSignal callback that writes the new child to result
+      parent.childRemovedSignal.connect([&result](NodeRef newChildRef){ result = newChildRef; });
+      // verify initial state
+      REQUIRE(result == nullptr);
+      // erase child
+      parent.erase(child);
+      // verify signal callback got executed
+      REQUIRE(result == child);
+    }
+
+    SECTION("for_erase_iterator"){
+      Node parent;
+      auto child = std::make_shared<Node>();
+      parent.push_back(child);
+      NodeRef result=nullptr;
+      // register newChildSignal callback that writes the new child to result
+      parent.childRemovedSignal.connect([&result](NodeRef newChildRef){ result = newChildRef; });
+      // verify initial state
+      REQUIRE(result == nullptr);
+      // erase child
+      REQUIRE(parent.erase(parent.begin()) == parent.end());
+      // verify signal callback got executed
+      REQUIRE(result == child);
+    }
+  }
 }

@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 
+#include "signal.hpp"
+
 namespace ctree {
 
   class Node;
@@ -35,6 +37,11 @@ namespace ctree {
       // pop_back
       // resize
       // swap
+
+    public: // signals
+
+      Signal<void(NodeRef)> newChildSignal;
+      Signal<void(NodeRef)> childRemovedSignal;
 
     private:
       NodeRef parentRef;
