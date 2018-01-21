@@ -18,6 +18,10 @@ namespace ctree {
 
     public:
 
+      static NodeRef create(){ return std::make_shared<Node>(); }
+
+    public:
+
       Node() : pParent(NULL) {
       }
 
@@ -34,6 +38,12 @@ namespace ctree {
       iterator erase(iterator first, iterator last );
       iterator erase(const_iterator first, const_iterator last );
       iterator erase(NodeRef nodeRef);
+      iterator erase(Node* node);
+
+      Node& add(NodeRef child){ this->push_back(child); return *this; }
+      Node& add(Node* child){ this->push_back(child); return *this; }
+      Node& remove(NodeRef child){ this->erase(child); return *this; }
+      Node& remove(Node* child){ this->erase(child); return *this; }
 
       void clear(){ for(auto child : (*this)) this->erase(child); }
 
