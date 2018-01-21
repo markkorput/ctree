@@ -18,6 +18,13 @@ namespace ctree {
 
     public:
 
+      Node() : pParent(NULL) {
+      }
+
+      // accessor methods
+      NodeRef child(unsigned int idx){ return (*this)[idx]; }
+      Node* parent(){ return this->pParent; }
+
       // modifier methods
       bool push_back(NodeRef nodeRef);
       bool push_back(Node* node){ return this->push_back(std::shared_ptr<Node>(node)); }
@@ -44,6 +51,6 @@ namespace ctree {
       Signal<void(NodeRef)> childRemovedSignal;
 
     private:
-      NodeRef parentRef;
+      Node* pParent;
   };
 }

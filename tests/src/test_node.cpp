@@ -74,4 +74,23 @@ TEST_CASE("ctree::Node", ""){
       REQUIRE(result == child);
     }
   }
+
+  SECTION("child_and_parent_add_and_erase"){
+    Node root;
+    NodeRef a1 = std::make_shared<Node>()
+      , a2 = std::make_shared<Node>()
+      , b1 = std::make_shared<Node>();
+
+    root.push_back(a1);
+    root.push_back(b1);
+    a1->push_back(a2);
+
+    REQUIRE(root.child(0)->child(0) == a2);
+    REQUIRE(root.child(0)->child(0)->parent() == a1.get());
+
+    root.erase(a1);
+    REQUIRE(root.child(0) == b1);
+    REQUIRE(a1->parent() == nullptr);
+    REQUIRE(a2->parent() == a1.get());
+  }
 }

@@ -13,28 +13,32 @@ bool Node::push_back(NodeRef nodeRef){
     return false;
 
   Super::push_back(nodeRef);
+  nodeRef->pParent = this;
+
   this->newChildSignal.emit(nodeRef);
   return true;
 }
 
 Node::iterator Node::erase(Node::iterator pos){
-  bool contained = (pos != this->end());
+  NodeRef removed = (pos != this->end()) ? *pos : nullptr;
 
   auto result = Super::erase(pos);
 
-  if(contained){
-    childRemovedSignal.emit(*pos);
+  if(removed){
+    removed->pParent=NULL;
+    childRemovedSignal.emit(removed);
   }
 
   return result;
 }
 
 Node::iterator Node::erase(Node::const_iterator pos){
-  bool contained = (pos != this->end());
+  NodeRef removed = (pos != this->end()) ? *pos : nullptr;
 
   auto result = Super::erase(pos);
 
-  if(contained){
+  if(removed){
+    removed->pParent=NULL;
     childRemovedSignal.emit(*pos);
   }
 
@@ -47,6 +51,7 @@ Node::iterator Node::erase(Node::iterator first, Node::iterator last ){
   auto result = Super::erase(first,last);
 
   for(auto removedNodeRef : removedNodeRefs){
+    removedNodeRef->pParent = NULL;
     childRemovedSignal.emit(removedNodeRef);
   }
 
@@ -59,6 +64,7 @@ Node::iterator Node::erase(Node::const_iterator first, Node::const_iterator last
   auto result = Super::erase(first,last);
 
   for(auto removedNodeRef : removedNodeRefs){
+    removedNodeRef->pParent = NULL;
     childRemovedSignal.emit(removedNodeRef);
   }
 
