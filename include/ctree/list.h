@@ -1,13 +1,10 @@
 #pragma once
 
 #include "signal_vector.hpp"
+#include "observer.h"
 #include "node.h"
 
 namespace ctree {
-  class NodeOp {
-    // NodeOp
-  };
-
   class List;
   typedef std::shared_ptr<List> ListRef;
 
@@ -19,8 +16,10 @@ namespace ctree {
       }
 
     public:
-      List(Node& root): pRoot(&root), bUpToDate(false){
-        this->setup();
+      List(Node& root): observer(root), bUpToDate(false){
+        auto func = [this](Node&n){ this->bUpToDate = false; };
+        this->observer.nodeAddedSignal.connect(func);
+        this->observer.nodeRemovedSignal.connect(func);
       }
 
       List& populated(){
@@ -30,17 +29,10 @@ namespace ctree {
       }
 
     private:
-      void setup();
-      void registerItem(Node& item);
-      void unregisterItem(Node& item);
-
-    private:
       void populate();
-      void walkDown(Node&, std::function<void(Node&)> func);
 
     private:
       bool bUpToDate;
-      Node* pRoot;
-      std::map<Node*, std::shared_ptr<std::vector<cinder::signals::Connection>>> itemConnections;
+      observer observer;
   };
 }

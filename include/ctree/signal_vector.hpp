@@ -4,31 +4,29 @@ namespace ctree {
   template<typename T>
   class signal_vector : public std::vector<T> {
 
-  public:
+    public:
+      // modifier methods
+      bool push_back(T item);
 
-    // modifier methods
-    bool push_back(T item);
+      typename std::vector<T>::iterator erase(typename std::vector<T>::iterator pos);
+      typename std::vector<T>::iterator erase(typename std::vector<T>::const_iterator pos);
+      typename std::vector<T>::iterator erase(typename std::vector<T>::iterator first, typename  std::vector<T>::iterator last );
+      typename std::vector<T>::iterator erase(typename std::vector<T>::const_iterator first, typename std::vector<T>::const_iterator last );
+      typename std::vector<T>::iterator erase(T item);
 
-    typename std::vector<T>::iterator erase(typename std::vector<T>::iterator pos);
-    typename std::vector<T>::iterator erase(typename std::vector<T>::const_iterator pos);
-    typename std::vector<T>::iterator erase(typename std::vector<T>::iterator first, typename  std::vector<T>::iterator last );
-    typename std::vector<T>::iterator erase(typename std::vector<T>::const_iterator first, typename std::vector<T>::const_iterator last );
-    typename std::vector<T>::iterator erase(T item);
+      void clear();
 
-    void clear();
+      // TODO overload the remaining modifier methods to make sure they all trigger the necessary event(s)
+      // void insert(T item){ std::cerr << "ctree::signal_vector::insert not yet implemented"; }
+      // emplace
+      // emplace_back
+      // pop_back
+      // resize
+      // swap
 
-    // TODO overload the remaining modifier methods to make sure they all trigger the necessary event(s)
-    // void insert(T item){ std::cerr << "ctree::signal_vector::insert not yet implemented"; }
-    // emplace
-    // emplace_back
-    // pop_back
-    // resize
-    // swap
-
-  public: // signals
-
-    Signal<void(T)> newItemSignal;
-    Signal<void(T)> itemRemovedSignal;
+    public: // signals
+      Signal<void(T)> newItemSignal;
+      Signal<void(T)> itemRemovedSignal;
   };
 
   template<typename T>
