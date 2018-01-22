@@ -11,15 +11,15 @@ namespace ctree {
   class List;
   typedef std::shared_ptr<List> ListRef;
 
-  class List : public signal_vector<NodeRef> {
+  class List : public signal_vector<Node*> {
     public:
-      static ListRef from(NodeRef rootRef){
-        auto list = std::make_shared<List>(rootRef);
+      static ListRef from(Node& root){
+        auto list = std::make_shared<List>(root);
         return list;
       }
 
     public:
-      List(NodeRef rootRef): rootRef(rootRef), bUpToDate(false){
+      List(Node& root): pRoot(&root), bUpToDate(false){
         this->setup();
       }
 
@@ -31,16 +31,16 @@ namespace ctree {
 
     private:
       void setup();
-      void registerItem(NodeRef itemRef);
-      void unregisterItem(NodeRef itemRef);
+      void registerItem(Node& item);
+      void unregisterItem(Node& item);
 
     private:
       void populate();
-      void walkDown(NodeRef, std::function<void(NodeRef)> func);
+      void walkDown(Node&, std::function<void(Node&)> func);
 
     private:
       bool bUpToDate;
-      NodeRef rootRef;
+      Node* pRoot;
       std::map<Node*, std::shared_ptr<std::vector<cinder::signals::Connection>>> itemConnections;
   };
 }

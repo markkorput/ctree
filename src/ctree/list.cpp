@@ -5,43 +5,31 @@
 using namespace ctree;
 
 void List::setup(){
-  this->newItemSignal.connect([this](NodeRef nodeRef){
-    this->registerItem(nodeRef);
+  this->newItemSignal.connect([this](Node* node){
+    this->registerItem(*node);
   });
 
-  this->itemRemovedSignal.connect([this](NodeRef nodeRef){
-    this->unregisterItem(nodeRef);
+  this->itemRemovedSignal.connect([this](Node* node){
+    this->unregisterItem(*node);
   });
 }
 
-void List::registerItem(NodeRef itemRef){
+void List::registerItem(Node& item){
   std::shared_ptr<std::vector<cinder::signals::Connection>> connections = std::make_shared<std::vector<cinder::signals::Connection>>();
 
-  connections->push_back(itemRef->newChildSignal.connect([this](NodeRef newChildRef){
+  auto func = [this](Node& child){
     this->bUpToDate=false;
+  };
 
-    // // register entire subtree
-    // this->walkDown(newChildRef, [this](NodeRef nodeRef){
-    //   this->registerItem(nodeRef);
-    // });
-  }));
-
-  connections->push_back(itemRef->childRemovedSignal.connect([this](NodeRef removedItemRef){
-    this->bUpToDate=false;
-
-    // // unregister entire subtree
-    // this->walkDown(removedItemRef, [this](NodeRef nodeRef){
-    //   this->unregisterItem(nodeRef);
-    // });
-  }));
-
-  this->itemConnections[itemRef.get()] = connections;
+  connections->push_back(item.newChildSignal.connect(func));
+  connections->push_back(item.childRemovedSignal.connect(func));
+  this->itemConnections[&item] = connections;
 }
 
-void List::unregisterItem(NodeRef itemRef){
-  auto connections = this->itemConnections[itemRef.get()];
+void List::unregisterItem(Node& item){
+  auto connections = this->itemConnections[&item];
 
-  if(connections == nullptr){
+  if(!connections){
     std::cerr << "no connections vector found for item";
     return;
   }
@@ -49,25 +37,24 @@ void List::unregisterItem(NodeRef itemRef){
   for(auto conn : (*connections))
     conn.disconnect();
 
-  this->itemConnections.erase(itemRef.get());
+  this->itemConnections.erase(&item);
 }
 
 void List::populate(){
   this->clear();
 
-  if(!this->rootRef) return;
+  if(!this->pRoot) return;
 
-  this->walkDown(this->rootRef, [this](NodeRef nodeRef){
-    this->push_back(nodeRef);
+  this->walkDown(*this->pRoot, [this](Node& node){
+    this->push_back(&node);
   });
 
   this->bUpToDate = true;
 }
 
-void List::walkDown(NodeRef nodeRef, std::function<void(NodeRef)> func){
-  func(nodeRef);
+void List::walkDown(Node& node, std::function<void(Node&)> func){
+  func(node);
 
-  for(auto child : (*nodeRef)){ // node
-    this->walkDown(child, func);
-  }
+  for(auto child : node)
+    this->walkDown(*child, func);
 }

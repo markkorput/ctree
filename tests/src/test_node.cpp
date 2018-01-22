@@ -13,8 +13,7 @@ TEST_CASE("ctree::Node", ""){
 
   SECTION("push_back"){
     Node parent;
-
-    auto child = std::make_shared<Node>();
+    auto child = Node::create();
 
     REQUIRE(parent.push_back(child));
     // use operator[] to get first child
@@ -26,17 +25,17 @@ TEST_CASE("ctree::Node", ""){
     // also takes regular pointers
     Node *child2 = new Node();
     REQUIRE(parent.push_back(child2));
-    REQUIRE(parent[1].get() == child2);
+    REQUIRE(parent[1] == child2);
   }
 
   SECTION("newChildSignal"){
     Node parent;
-    auto child = std::make_shared<Node>();
-    NodeRef result=nullptr;
+    auto child = Node::create();
+    Node* result=NULL;
     // register newChildSignal callback that writes the new child to result
-    parent.newChildSignal.connect([&result](NodeRef newChildRef){ result = newChildRef; });
+    parent.newChildSignal.connect([&result](Node& newChild){ result = &newChild; });
     // verify initial state
-    REQUIRE(result == nullptr);
+    REQUIRE(result == NULL);
     // add child
     parent.push_back(child);
     // verify signal callback got executed
@@ -44,15 +43,15 @@ TEST_CASE("ctree::Node", ""){
   }
 
   SECTION("childRemovedSignal"){
-    SECTION("for_erase_NodeRef"){
+    SECTION("for_erase_Node"){
       Node parent;
-      auto child = std::make_shared<Node>();
+      auto child = Node::create();
       parent.push_back(child);
-      NodeRef result=nullptr;
+      Node* result=NULL;
       // register newChildSignal callback that writes the new child to result
-      parent.childRemovedSignal.connect([&result](NodeRef newChildRef){ result = newChildRef; });
+      parent.childRemovedSignal.connect([&result](Node& newChild){ result = &newChild; });
       // verify initial state
-      REQUIRE(result == nullptr);
+      REQUIRE(result == NULL);
       // erase child
       parent.erase(child);
       // verify signal callback got executed
@@ -61,13 +60,13 @@ TEST_CASE("ctree::Node", ""){
 
     SECTION("for_erase_iterator"){
       Node parent;
-      auto child = std::make_shared<Node>();
+      auto child = Node::create();
       parent.push_back(child);
-      NodeRef result=nullptr;
+      Node* result=NULL;
       // register newChildSignal callback that writes the new child to result
-      parent.childRemovedSignal.connect([&result](NodeRef newChildRef){ result = newChildRef; });
+      parent.childRemovedSignal.connect([&result](Node& newChild){ result = &newChild; });
       // verify initial state
-      REQUIRE(result == nullptr);
+      REQUIRE(result == NULL);
       // erase child
       REQUIRE(parent.erase(parent.begin()) == parent.end());
       // verify signal callback got executed
@@ -77,20 +76,20 @@ TEST_CASE("ctree::Node", ""){
 
   SECTION("child_and_parent_add_and_erase"){
     Node root;
-    NodeRef a1 = std::make_shared<Node>()
-      , a2 = std::make_shared<Node>()
-      , b1 = std::make_shared<Node>();
+    auto a1 = Node::create()
+      , a2 = Node::create()
+      , b1 = Node::create();
 
-    root.push_back(a1);
-    root.push_back(b1);
-    a1->push_back(a2);
+    root
+      .add(a1->add(*a2))
+      .add(*b1);
 
     REQUIRE(root.child(0)->child(0) == a2);
-    REQUIRE(root.child(0)->child(0)->parent() == a1.get());
+    REQUIRE(root.child(0)->child(0)->parent() == a1);
 
     root.erase(a1);
     REQUIRE(root.child(0) == b1);
-    REQUIRE(a1->parent() == nullptr);
-    REQUIRE(a2->parent() == a1.get());
+    REQUIRE(a1->parent() == NULL);
+    REQUIRE(a2->parent() == a1);
   }
 }
