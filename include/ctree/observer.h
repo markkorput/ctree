@@ -23,9 +23,9 @@ namespace ctree {
       void registerItem(Node& item, bool recursive=true);
       void unregisterItem(Node& item, bool recursive=true);
 
-    protected: // virtual method for custom behaviour by inheriting classes
-      virtual void nodeAdded(Node& item){}
-      virtual void nodeRemoved(Node& item){}
+    // protected: // virtual method for custom behaviour by inheriting classes
+    //   virtual void nodeAdded(Node& item){}
+    //   virtual void nodeRemoved(Node& item){}
 
     public: // signals
       Signal<void(Node&)> nodeAddedSignal;

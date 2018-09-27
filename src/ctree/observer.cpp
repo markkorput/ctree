@@ -27,13 +27,13 @@ void observer::registerItem(Node& item, bool recursive){
   // TODO; optimize by storing one instance of both lambdas in thise observer instance and always using those
   connections->push_back(item.newChildSignal.connect([this](Node& node){
     this->registerItem(node);
-    this->nodeAdded(node);
+    // this->nodeAdded(node);
     this->nodeAddedSignal.emit(node);
   }));
 
   connections->push_back(item.childRemovedSignal.connect([this](Node& node){
     this->unregisterItem(node);
-    this->nodeRemoved(node);
+    // this->nodeRemoved(node);
     this->nodeRemovedSignal.emit(node);
   }));
 
@@ -52,7 +52,7 @@ void observer::unregisterItem(Node& item, bool recursive){
   auto connections = this->itemConnections[&item];
 
   if(!connections){
-    std::cerr << "no connections vector found for item";
+    std::cerr << "[ctree::observer::unregisterItem] no connections vector found";
     return;
   }
 

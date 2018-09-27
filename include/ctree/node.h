@@ -10,6 +10,9 @@ namespace ctree {
   class Node;
   typedef std::shared_ptr<Node> NodeRef;
 
+  //! A node in the hierarchical tree structure;
+  //! basically a vector of pointers to child nodes,
+  // and a single pointer to an (potential) parent node.
   class Node : public std::vector<Node*> {
     public:
 
@@ -57,6 +60,7 @@ namespace ctree {
       Signal<void(Node&)> childRemovedSignal;
 
     private:
+
       Node* pParent;
   };
 }

@@ -1,6 +1,10 @@
 #include "signal.hpp"
 
 namespace ctree {
+
+  //! signal_vector extends std::vector with two public Signal attributes;
+  //! `newItemSignal` and `itemRemovedSignal`, which are emited when mutations
+  //! on the vector happen.
   template<typename T>
   class signal_vector : public std::vector<T> {
 
